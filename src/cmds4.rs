@@ -460,3 +460,197 @@ pub fn cmd_portfacts(ctx: &mut Ctx, a: &Args) -> Result<Value, String> {
     Ok(json!({"other_exe": other, "facts_considered": names.len(), "ported": out,
         "reading": "each named function is looked up in the other exe; only `derived` verdicts are safe to carry as candidates, `hint`/`candidate` need a second route. Nothing is asserted automatically."}))
 }
+
+// struct-from-fn <fn> [--depth N]
+pub fn cmd_struct_from_fn(ctx: &mut Ctx, a: &Args) -> Result<Value, String> {
+    ctx.prep();
+    let f = fn_arg(ctx, a, 0)?;
+    let depth = a.num("depth", 3);
+    let root_sum = ctx.sum(f);
+    if !root_sum.cfg.blocks.contains_key(&root_sum.cfg.begin) {
+        return Err(format!("no decodable code at {:#x}: cannot analyse function", f));
+    }
+
+    // Trace this/a0 through direct calls and collect per-offset merged field accesses.
+    #[derive(Default)]
+    struct FAcc {
+        reads: u32,
+        writes: u32,
+        readers: BTreeSet<u32>,
+        writers: BTreeSet<u32>,
+    }
+    let mut fields: BTreeMap<i64, FAcc> = BTreeMap::new();
+    let mut visited: HashSet<(u32, i64)> = HashSet::new();
+    let mut work: Vec<(u32, i64, usize)> = vec![(f, 0, 0)];
+    let mut call_tree: Vec<Value> = vec![];
+    let mut call_tree_seen: HashSet<(u32, i64)> = HashSet::new();
+
+    while let Some((cur, delta, d)) = work.pop() {
+        if !visited.insert((cur, delta)) {
+            continue;
+        }
+        let s = ctx.sum(cur);
+
+        for x in s.accs.iter().filter(|x| !x.indexed && x.base == E::Arg(0)) {
+            let off = x.off + delta;
+            let e = fields.entry(off).or_default();
+            if x.read {
+                e.reads += 1;
+                e.readers.insert(cur);
+            }
+            if x.write {
+                e.writes += 1;
+                e.writers.insert(cur);
+            }
+        }
+
+        if d < depth {
+            for c in &s.calls {
+                if let Tgt::Direct(t) = &c.tgt {
+                    if let Some(first) = c.args.first() {
+                        let (b, k) = first.split();
+                        if b == E::Arg(0) {
+                            let shift = delta + k;
+                            work.push((*t, shift, d + 1));
+                            if call_tree_seen.insert((*t, shift)) {
+                                // Collect fields accessed in that callee context (relative to root this).
+                                let cs = ctx.sum(*t);
+                                let mut fset: BTreeSet<String> = BTreeSet::new();
+                                for x in cs.accs.iter().filter(|x| !x.indexed && x.base == E::Arg(0)) {
+                                    fset.insert(sgn(x.off + shift));
+                                }
+                                let receives = if k == 0 { "a0".to_string() } else { format!("a0{}", if k < 0 { format!("-{:#x}", -k) } else { format!("+{:#x}", k) }) };
+                                call_tree.push(json!({
+                                    "fn": ctx.flabel(*t),
+                                    "receives_ptr_as": receives,
+                                    "offset_shift": sgn(shift),
+                                    "fields_accessed": fset.into_iter().collect::<Vec<_>>(),
+                                }));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Role detection (root function, data-driven).
+    let mut this_reads = 0u32;
+    let mut this_writes = 0u32;
+    let mut first_this_write_idx: Option<usize> = None;
+    let mut first_this_read_idx: Option<usize> = None;
+    let mut has_const_or_vtable_store = false;
+    for (idx, x) in root_sum.accs.iter().enumerate() {
+        if x.indexed || x.base != E::Arg(0) {
+            continue;
+        }
+        if x.read {
+            this_reads += 1;
+            if first_this_read_idx.is_none() {
+                first_this_read_idx = Some(idx);
+            }
+        }
+        if x.write {
+            this_writes += 1;
+            if first_this_write_idx.is_none() {
+                first_this_write_idx = Some(idx);
+            }
+            match &x.value {
+                Some(E::Imm(_)) => has_const_or_vtable_store = true,
+                Some(E::Glob(g)) => {
+                    if ctx.vts.as_ref().unwrap().by_rva.contains_key(g) {
+                        has_const_or_vtable_store = true;
+                    }
+                }
+                _ => {}
+            }
+        }
+    }
+    let mut pass_this_calls = 0u32;
+    for c in &root_sum.calls {
+        if c.args.first() == Some(&E::Arg(0)) {
+            pass_this_calls += 1;
+        }
+    }
+
+    let mut role = "unknown".to_string();
+    let mut confidence = "low".to_string();
+    let mut role_evidence: Vec<String> = vec![];
+
+    if this_reads == 0 && this_writes == 0 {
+        role_evidence.push("no direct accesses through this (a0) observed in the root function".to_string());
+        role_evidence.push(format!("{} call(s) pass a0 unchanged to callees", pass_this_calls));
+    } else {
+        role_evidence.push(format!("this (a0) field accesses in root: {} read(s), {} write(s)", this_reads, this_writes));
+        if has_const_or_vtable_store {
+            role_evidence.push("writes to this include constant/vtable stores".to_string());
+        }
+        role_evidence.push(format!("{} call(s) pass a0 unchanged to callees", pass_this_calls));
+
+        let early_writes = match (first_this_write_idx, first_this_read_idx) {
+            (Some(wi), Some(ri)) => wi <= ri,
+            (Some(_), None) => true,
+            _ => false,
+        };
+        if this_writes > 0 && (early_writes || this_writes >= this_reads.saturating_mul(2)) {
+            if has_const_or_vtable_store || early_writes {
+                role = "constructor".to_string();
+                confidence = if has_const_or_vtable_store || (early_writes && this_writes >= this_reads.saturating_add(1)) {
+                    "high".to_string()
+                } else {
+                    "medium".to_string()
+                };
+                role_evidence.push("predominantly writes to this fields early and/or initialising stores".to_string());
+            } else {
+                role = "consumer".to_string();
+                confidence = "medium".to_string();
+                role_evidence.push("writes to this fields dominate but without clear initialising evidence".to_string());
+            }
+        } else if this_reads > 0 && this_writes == 0 {
+            if !root_sum.rets.is_empty() {
+                role = "extractor".to_string();
+                confidence = "medium".to_string();
+                role_evidence.push("reads this fields, returns values, and has no writes to this".to_string());
+            } else {
+                role = "consumer".to_string();
+                confidence = "medium".to_string();
+                role_evidence.push("reads this fields with no writes to this and no returned values recorded".to_string());
+            }
+        } else if this_reads > 0 && this_reads > this_writes.saturating_mul(2) {
+            if !root_sum.rets.is_empty() {
+                role = "extractor".to_string();
+                confidence = "low".to_string();
+                role_evidence.push("reads of this fields dominate writes and the function returns values".to_string());
+            } else {
+                role = "consumer".to_string();
+                confidence = "low".to_string();
+                role_evidence.push("reads of this fields dominate writes".to_string());
+            }
+        } else {
+            role_evidence.push("mixed or weak this-pointer usage pattern; role not classified".to_string());
+        }
+    }
+
+    let fields_json: Vec<Value> = fields
+        .into_iter()
+        .map(|(off, fa)| {
+            json!({
+                "offset": sgn(off),
+                "reads": fa.reads,
+                "writes": fa.writes,
+                "readers": fa.readers.iter().map(|x| ctx.flabel(*x)).collect::<Vec<_>>(),
+                "writers": fa.writers.iter().map(|x| ctx.flabel(*x)).collect::<Vec<_>>(),
+            })
+        })
+        .collect();
+
+    Ok(json!({
+        "fn": ctx.flabel(f),
+        "role": role,
+        "confidence": confidence,
+        "role_evidence": role_evidence,
+        "fields": fields_json,
+        "call_tree": call_tree,
+        "trust": "derived (from symbolic summaries and call-tree tracing; role is a classification, not a proven fact)"
+    }))
+}
