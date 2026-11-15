@@ -1,5 +1,24 @@
+# Rust/cargo build artifacts
 target/
 *.exe
 *.pdb
 *.d
 .fingerprint/
+
+# Build logs
+*.log
+build.log
+clippy.log
+
+# IDE
+.vscode/
+.idea/
+*.user
+
+# OS
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# Test artifacts
+test_speed_accuracy.results.json
