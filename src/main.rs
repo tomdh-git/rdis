@@ -23,6 +23,7 @@ pub fn emit(s: &str) {
 macro_rules! println { () => { $crate::emit("") }; ($($a:tt)*) => { $crate::emit(&format!($($a)*)) }; }
 mod cfg;
 mod cmds;
+mod walk;
 mod cmds2;
 mod cmds3;
 mod cmds4;
@@ -338,6 +339,11 @@ fn cmd_name(ctx: &mut Ctx, rva: u32, name: &str) {
 const HELP: &str = "commands (addresses: 0xRVA, sub_RVA, a name, or a byte signature):
   fn <addr> [--max N] [--nochains]   annotated function: labels, call names, strings, vcall slots, pointer chains (a0 = first argument)
   dis <addr> [n]                     linear listing of n instructions (default 40)
+   walk <addr> [--reg R]              control-flow walk from <addr>: follow straight-line code,
+                                       both sides of conditional jumps and the target of
+                                       unconditional jmps, continue after calls, stop a path
+                                       at ret/int3/ud2 and at an indirect jmp; print
+                                       reachable instructions sorted by address
   xr <addr> [--max N]                every call/jmp/rip-relative reference to the address
   callers <addr>                     the functions that call or jump to it
   callees <addr>                     what a function calls, and the strings it references
@@ -395,6 +401,7 @@ fn run_inner(ctx: &mut Ctx, line: &str) {
             "--w" => r = false,
             "-i" => ci = true,
             "--base" => { base = toks.get(i + 1).and_then(|t| reg_of(t)); i += 1; }
+            "--reg" => { base = toks.get(i + 1).and_then(|t| reg_of(t)); i += 1; }
             t => rest.push(t),
         }
         i += 1;
@@ -415,6 +422,10 @@ fn run_inner(ctx: &mut Ctx, line: &str) {
             "callers" => { let a = resolve(ctx, &rest)?; cmd_xr(ctx, a, max, true); }
             "callees" => { let a = resolve(ctx, &rest)?; cmd_callees(ctx, a); }
             "str" => cmd_str(ctx, &rest.join(" "), max, ci),
+            "walk" => {
+                let a = resolve(ctx, &rest)?;
+                walk::walk(ctx, a, base);
+            }
             "fld" => {
                 let d = rest.first().ok_or("fld needs a displacement")?;
                 let disp = i64::from_str_radix(d.trim_start_matches("0x"), 16).map_err(|e| e.to_string())?;
@@ -451,7 +462,7 @@ fn main() {
     if args.is_empty() { eprintln!("usage: rdis <exe> [-c \"cmd; cmd\" | cmd args...]   (rdis <exe> then `help`)"); std::process::exit(2); }
     let mut ctx = load(&args[0]);
     if args.len() > 1 { PRETTY.store(false, std::sync::atomic::Ordering::Relaxed); }
-    const CMDS: [&str; 61] = ["gobj", "ptables", "structm", "struct-from-fn", "worklist", "observe", "portfacts", "port", "abi", "sigcheck", "hookpoints", "flow", "contradict", "surprises", "corroborate", "investigate", "recipes", "bench", "needs", "decide", "choke", "common", "uses", "anchors", "comps", "sum", "cfg", "gates", "path", "reach", "classes", "class", "vslot", "vcalls", "rw", "struct", "system", "assert", "retract", "contest", "facts", "why", "audit", "info", "fn", "ptr", "comp", "dis", "xr", "callers", "callees", "str", "fld", "imm", "vt", "find", "name", "names", "sec", "help", "?"];
+    const CMDS: [&str; 62] = ["gobj", "ptables", "structm", "struct-from-fn", "worklist", "observe", "portfacts", "port", "abi", "sigcheck", "hookpoints", "flow", "contradict", "surprises", "corroborate", "investigate", "recipes", "bench", "needs", "decide", "choke", "common", "uses", "anchors", "comps", "sum", "cfg", "gates", "path", "reach", "classes", "class", "vslot", "vcalls", "rw", "struct", "system", "assert", "retract", "contest", "facts", "why", "audit", "info", "fn", "ptr", "comp", "dis", "xr", "callers", "callees", "str", "fld", "imm", "vt", "find", "name", "names", "sec", "help", "?", "walk"];
     if args.len() == 2 && args[1] == "--mcp" {
         PRETTY.store(false, std::sync::atomic::Ordering::Relaxed);
         mcp::serve(&mut ctx);
