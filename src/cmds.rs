@@ -379,6 +379,7 @@ fn base_matches(b: &E, comp: Option<&str>, this: bool) -> bool {
 pub fn cmd_rw(ctx: &mut Ctx, a: &Args) -> Result<Value, String> {
     ctx.prep();
     let off = i64::from_str_radix(a.pos.first().ok_or("rw <off> [--comp N|--class C|--fn F]")?.trim_start_matches("0x").trim_start_matches('+'), 16).map_err(|e| e.to_string())?;
+    if off > 0x10000 { return Err(format!("displacement {:#x} is larger than 0x10000; this looks like a function address, not a field offset. fld/rw expect small field displacements (e.g. 0xE0). Use `fn` or `callees` for function addresses.", off)); }
     let (fns, comp, this, scope): (Vec<u32>, Option<String>, bool, String) = if let Some(c) = a.s("comp") { (comp_functions(ctx, c), None, false, format!("functions that use the type hash of {} (scope only: the base of an access is NOT tied to the component, see `sum` legend)", c)) }
         else if let Some(c) = a.s("class") { (class_functions(ctx, c), None, true, format!("vtable members of {}", c)) }
         else if let Some(f) = a.s("fn") { let r = crate::resolve(ctx, &[f])?; (vec![r], None, false, "one function".into()) }

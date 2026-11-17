@@ -23,6 +23,7 @@ pub fn emit(s: &str) {
 macro_rules! println { () => { $crate::emit("") }; ($($a:tt)*) => { $crate::emit(&format!($($a)*)) }; }
 mod cfg;
 mod cmds;
+mod walk;
 mod cmds2;
 mod cmds3;
 mod cmds4;
@@ -338,6 +339,11 @@ fn cmd_name(ctx: &mut Ctx, rva: u32, name: &str) {
 const HELP: &str = "commands (addresses: 0xRVA, sub_RVA, a name, or a byte signature):
   fn <addr> [--max N] [--nochains]   annotated function: labels, call names, strings, vcall slots, pointer chains (a0 = first argument)
   dis <addr> [n]                     linear listing of n instructions (default 40)
+   walk <addr> [--reg R]              control-flow walk from <addr>: follow straight-line code,
+                                       both sides of conditional jumps and the target of
+                                       unconditional jmps, continue after calls, stop a path
+                                       at ret/int3/ud2 and at an indirect jmp; print
+                                       reachable instructions sorted by address
   xr <addr> [--max N]                every call/jmp/rip-relative reference to the address
   callers <addr>                     the functions that call or jump to it
   callees <addr>                     what a function calls, and the strings it references
@@ -369,7 +375,7 @@ fn run_inner(ctx: &mut Ctx, line: &str) {
             "assert" => Some(cmds::cmd_assert(ctx, &args)), "retract" => Some(cmds::cmd_retract(ctx, &args)), "contest" => Some(cmds::cmd_contest(ctx, &args)),
             "bench" => Some(cmds::cmd_bench(ctx, &args)),
             "facts" => Some(cmds::cmd_facts(ctx, &args)), "why" => Some(cmds::cmd_why(ctx, &args)), "audit" => Some(cmds::cmd_audit(ctx, &args)),
-            "info" => Some(cmds::cmd_info(ctx, &args)), "comps" => Some(cmds::cmd_comps(ctx, &args)), "decide" => Some(cmds2::cmd_decide(ctx, &args)), "choke" => Some(cmds2::cmd_choke(ctx, &args)), "needs" => Some(cmds::cmd_needs(ctx, &args)), "port" => Some(cmds3::cmd_port(ctx, &args)), "gobj" => Some(cmds4::cmd_gobj(ctx, &args)), "ptables" => Some(cmds4::cmd_ptables(ctx, &args)), "structm" => Some(cmds4::cmd_structm(ctx, &args)), "worklist" => Some(cmds4::cmd_worklist(ctx, &args)), "observe" => Some(cmds4::cmd_observe(ctx, &args)), "portfacts" => Some(cmds4::cmd_portfacts(ctx, &args)), "abi" => Some(cmds3::cmd_abi(ctx, &args)), "sigcheck" => Some(cmds3::cmd_sigcheck(ctx, &args)), "hookpoints" => Some(cmds3::cmd_hookpoints(ctx, &args)), "flow" => Some(cmds3::cmd_flow(ctx, &args)), "contradict" => Some(cmds3::cmd_contradict(ctx, &args)), "surprises" => Some(cmds3::cmd_surprises(ctx, &args)), "corroborate" => Some(cmds3::cmd_corroborate(ctx, &args)), "investigate" => Some(cmds3::cmd_investigate(ctx, &args)), "recipes" => Some(cmds3::cmd_recipes(ctx, &args)), "common" => Some(cmds2::cmd_common(ctx, &args)), "uses" => Some(cmds2::cmd_uses(ctx, &args)), "anchors" => Some(cmds2::cmd_anchors(ctx, &args)), "comp" => Some(cmds::cmd_comp(ctx, &args)),
+            "info" => Some(cmds::cmd_info(ctx, &args)), "comps" => Some(cmds::cmd_comps(ctx, &args)), "decide" => Some(cmds2::cmd_decide(ctx, &args)), "choke" => Some(cmds2::cmd_choke(ctx, &args)), "needs" => Some(cmds::cmd_needs(ctx, &args)), "port" => Some(cmds3::cmd_port(ctx, &args)), "gobj" => Some(cmds4::cmd_gobj(ctx, &args)), "ptables" => Some(cmds4::cmd_ptables(ctx, &args)), "structm" => Some(cmds4::cmd_structm(ctx, &args)), "struct-from-fn" => Some(cmds4::cmd_struct_from_fn(ctx, &args)), "worklist" => Some(cmds4::cmd_worklist(ctx, &args)), "observe" => Some(cmds4::cmd_observe(ctx, &args)), "portfacts" => Some(cmds4::cmd_portfacts(ctx, &args)), "abi" => Some(cmds3::cmd_abi(ctx, &args)), "sigcheck" => Some(cmds3::cmd_sigcheck(ctx, &args)), "hookpoints" => Some(cmds3::cmd_hookpoints(ctx, &args)), "flow" => Some(cmds3::cmd_flow(ctx, &args)), "contradict" => Some(cmds3::cmd_contradict(ctx, &args)), "surprises" => Some(cmds3::cmd_surprises(ctx, &args)), "corroborate" => Some(cmds3::cmd_corroborate(ctx, &args)), "investigate" => Some(cmds3::cmd_investigate(ctx, &args)), "recipes" => Some(cmds3::cmd_recipes(ctx, &args)), "common" => Some(cmds2::cmd_common(ctx, &args)), "uses" => Some(cmds2::cmd_uses(ctx, &args)), "anchors" => Some(cmds2::cmd_anchors(ctx, &args)), "comp" => Some(cmds::cmd_comp(ctx, &args)),
             "name" => { let mut a2 = vec!["name".to_string()]; a2.extend(t[1..].iter().cloned()); Some(cmds::cmd_assert(ctx, &cmds::Args::parse(&a2))) }
             _ => None,
         };
@@ -395,6 +401,7 @@ fn run_inner(ctx: &mut Ctx, line: &str) {
             "--w" => r = false,
             "-i" => ci = true,
             "--base" => { base = toks.get(i + 1).and_then(|t| reg_of(t)); i += 1; }
+            "--reg" => { base = toks.get(i + 1).and_then(|t| reg_of(t)); i += 1; }
             t => rest.push(t),
         }
         i += 1;
@@ -415,9 +422,16 @@ fn run_inner(ctx: &mut Ctx, line: &str) {
             "callers" => { let a = resolve(ctx, &rest)?; cmd_xr(ctx, a, max, true); }
             "callees" => { let a = resolve(ctx, &rest)?; cmd_callees(ctx, a); }
             "str" => cmd_str(ctx, &rest.join(" "), max, ci),
+            "walk" => {
+                let a = resolve(ctx, &rest)?;
+                walk::walk(ctx, a, base);
+            }
             "fld" => {
                 let d = rest.first().ok_or("fld needs a displacement")?;
                 let disp = i64::from_str_radix(d.trim_start_matches("0x"), 16).map_err(|e| e.to_string())?;
+                if disp > 0x10000 {
+                    return Err(format!("displacement {:#x} is larger than 0x10000; this looks like a function address, not a field offset. fld/rw expect small field displacements (e.g. 0xE0). Use `fn` or `callees` for function addresses.", disp));
+                }
                 cmd_fld(ctx, &Fld { disp, base, reads: r, writes: w }, max);
             }
             "imm" => { let v = rest.first().ok_or("imm needs a value")?; cmd_imm(ctx, u64::from_str_radix(v.trim_start_matches("0x"), 16).map_err(|e| e.to_string())?, max); }
@@ -448,7 +462,7 @@ fn main() {
     if args.is_empty() { eprintln!("usage: rdis <exe> [-c \"cmd; cmd\" | cmd args...]   (rdis <exe> then `help`)"); std::process::exit(2); }
     let mut ctx = load(&args[0]);
     if args.len() > 1 { PRETTY.store(false, std::sync::atomic::Ordering::Relaxed); }
-    const CMDS: [&str; 60] = ["gobj", "ptables", "structm", "worklist", "observe", "portfacts", "port", "abi", "sigcheck", "hookpoints", "flow", "contradict", "surprises", "corroborate", "investigate", "recipes", "bench", "needs", "decide", "choke", "common", "uses", "anchors", "comps", "sum", "cfg", "gates", "path", "reach", "classes", "class", "vslot", "vcalls", "rw", "struct", "system", "assert", "retract", "contest", "facts", "why", "audit", "info", "fn", "ptr", "comp", "dis", "xr", "callers", "callees", "str", "fld", "imm", "vt", "find", "name", "names", "sec", "help", "?"];
+    const CMDS: [&str; 62] = ["gobj", "ptables", "structm", "struct-from-fn", "worklist", "observe", "portfacts", "port", "abi", "sigcheck", "hookpoints", "flow", "contradict", "surprises", "corroborate", "investigate", "recipes", "bench", "needs", "decide", "choke", "common", "uses", "anchors", "comps", "sum", "cfg", "gates", "path", "reach", "classes", "class", "vslot", "vcalls", "rw", "struct", "system", "assert", "retract", "contest", "facts", "why", "audit", "info", "fn", "ptr", "comp", "dis", "xr", "callers", "callees", "str", "fld", "imm", "vt", "find", "name", "names", "sec", "help", "?", "walk"];
     if args.len() == 2 && args[1] == "--mcp" {
         PRETTY.store(false, std::sync::atomic::Ordering::Relaxed);
         mcp::serve(&mut ctx);
