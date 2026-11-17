@@ -292,7 +292,7 @@ $speedResults += Speed-Test "classes"                @($TestExe, "classes")
 $speedResults += Speed-Test "sum"                    @($TestExe, "sum", $FnHex)
 $speedResults += Speed-Test "vt"                     @($TestExe, "vt", $VtHex, "32")
 $speedResults += Speed-Test "surprises --max 50"     @($TestExe, "surprises", "--max", "50")
-$speedResults += Speed-Test "bench"                  @($TestExe, "bench")
+$speedResults += Speed-Test "bench"                  @($TestExe, "bench")`r`n$speedResults += Speed-Test "struct-from-fn"         @($TestExe, "struct-from-fn", $FnHex)
 $speedResults += Speed-Test "batch -c"               @($TestExe, "-c", "info; sec; names; classes; surprises")
 
 # Capture bench phase data for the report (alongside the background-subagent reference).
@@ -346,6 +346,52 @@ if ($accAudit.First) {
     $broken = [int]$accAudit.First.broken
     Write-Result "ACCURACY" "audit broken==0" ($broken -eq 0) ("broken=$broken checked=$($accAudit.First.facts_checked)")
 }
+
+#-------------------------------------------------------------------------------
+# Phase 3b: New feature validation (fld/rw validation, struct-from-fn).
+#-------------------------------------------------------------------------------
+Write-Host "`n== Phase 3b: New feature validation =="
+
+# fld validation: function address as displacement -> expected error
+$r = Invoke-Rdis $RdisExe @($TestExe, "fld", "0x66d9af0")
+$fldBadPass = (-not $r.StartFailed) -and (($r.Out -match "displacement 0x66d9af0 is larger than 0x10000") -or ($r.Out -match "function address"))
+Write-Result "NEW-FEATURE" "fld rejects function address as displacement" $fldBadPass ("exit={0} out={1}" -f $r.ExitCode, ($r.Out.Trim() -replace "`r?`n"," "))
+
+# rw validation: same error
+$r = Invoke-Rdis $RdisExe @($TestExe, "rw", "0x66d9af0")
+$rwBadPass = (-not $r.StartFailed) -and (($r.Out -match "displacement 0x66d9af0 is larger than 0x10000") -or ($r.Out -match "function address"))
+Write-Result "NEW-FEATURE" "rw rejects function address as displacement" $rwBadPass ("exit={0} out={1}" -f $r.ExitCode, ($r.Out.Trim() -replace "`r?`n"," "))
+
+# fld normal case: small offset, returns results or valid empty result (not error)
+$r = Invoke-Rdis $RdisExe @($TestExe, "fld", "0xE0", "--w", "--max", "10")
+$fldOkPass = (-not $r.StartFailed) -and ($r.Out.Length -gt 0) -and ($r.Out -notmatch '"error"') -and ($r.Out -notmatch 'error:')
+Write-Result "NEW-FEATURE" "fld 0xE0 --w --max 10 normal case" $fldOkPass ("exit={0} outLen={1}" -f $r.ExitCode, $r.Out.Length)
+
+# struct-from-fn on valid function RVA
+$r = Invoke-Rdis $RdisExe @($TestExe, "struct-from-fn", $FnHex)
+$sff = First-Json $r.Out
+$sffKeysOk = $false
+$sffRoleOk = $false
+if ($sff) {
+    $props = @($sff.PSObject.Properties.Name)
+    $need = @("fn","role","confidence","role_evidence","fields","call_tree","trust")
+    $sffKeysOk = ($need | Where-Object { $props -notcontains $_ }).Count -eq 0
+    $sffRoleOk = $sff.role -in @("constructor","extractor","consumer","unknown")
+}
+Write-Result "NEW-FEATURE" "struct-from-fn valid RVA returns required keys" $sffKeysOk ("keysOk={0} role={1}" -f $sffKeysOk, $(if($sff){$sff.role}else{"null"}))
+Write-Result "NEW-FEATURE" "struct-from-fn role is valid enum" $sffRoleOk ("role={0}" -f $(if($sff){$sff.role}else{"null"}))
+
+# struct-from-fn with --depth parameter if supported
+$r = Invoke-Rdis $RdisExe @($TestExe, "struct-from-fn", $FnHex, "--depth", "2")
+$sffDepth = First-Json $r.Out
+$depthOk = ($sffDepth -ne $null) -and ($r.Out -notmatch '"error"')
+Write-Result "NEW-FEATURE" "struct-from-fn --depth 2 supported" $depthOk ("jsonOk={0} exit={1}" -f ($sffDepth -ne $null), $r.ExitCode)
+
+# struct-from-fn on invalid/non-function address: proper error, no fake fallback
+$r = Invoke-Rdis $RdisExe @($TestExe, "struct-from-fn", "0x0")
+$sffBad = First-Json $r.Out
+$badOk = (($r.ExitCode -ne 0) -or ($r.Out -match '"error"')) -and ($r.Out -notmatch '"role":"constructor"') -and ($r.Out -notmatch '"role":"extractor"') -and ($r.Out -notmatch '"role":"consumer"')
+Write-Result "NEW-FEATURE" "struct-from-fn invalid address returns error (no fake fallback)" $badOk ("exit={0} out={1}" -f $r.ExitCode, ($r.Out.Trim() -replace "`r?`n"," "))
 
 #-------------------------------------------------------------------------------
 # Phase 4a: Functional tests - all 60 registered commands emit valid JSON.
