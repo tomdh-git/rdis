@@ -1,20 +1,20 @@
 ﻿{
-    "testExe":  "C:\\Users\\Atomi\\Desktop\\BlueySenseV2\\tools\\rdis\\target\\release\\rdis.exe",
-    "rdisExe":  "C:\\Users\\Atomi\\Desktop\\BlueySenseV2\\tools\\rdis\\target\\release\\rdis.exe",
-    "functionsPdata":  9823,
+    "testExe":  "C:\\Users\\Atomi\\Desktop\\tomdh-git\\rdis\\target\\release\\rdis.exe",
+    "rdisExe":  "C:\\Users\\Atomi\\Desktop\\tomdh-git\\rdis\\target\\release\\rdis.exe",
+    "functionsPdata":  9999,
     "vtables":  32,
-    "xrefPairs":  95818,
+    "xrefPairs":  97105,
     "imageBase":  "0x140000000",
-    "chosenFn":  "0x46C80",
-    "chosenVtable":  "0x3631A8",
+    "chosenFn":  "0x4A3D0",
+    "chosenVtable":  "0x371390",
     "signature":  "55 41 57 41 56 41 55 41 54 56 57 53 48 81 EC 88 03 00 00 48 8D AC 24 80",
-    "edgeFrom":  "0x46C80",
-    "edgeTo":  "0x46C80",
-    "totalSpeedMs":  13378.9,
+    "edgeFrom":  "0x4A3D0",
+    "edgeTo":  "0x4A3D0",
+    "totalSpeedMs":  14585.1,
     "idaMinMs":  900000,
     "idaMaxMs":  1200000,
-    "speedupMin":  67,
-    "speedupMax":  90,
+    "speedupMin":  62,
+    "speedupMax":  82,
     "refBenchMs":  21,
     "benchPhases":  [
                         {
@@ -23,12 +23,12 @@
                         },
                         {
                             "ms":  1,
-                            "pairs":  95818,
+                            "pairs":  97105,
                             "phase":  "xref_index"
                         },
                         {
                             "count":  32,
-                            "ms":  2,
+                            "ms":  3,
                             "phase":  "vtables"
                         },
                         {
@@ -37,641 +37,690 @@
                             "phase":  "sum_per_fn"
                         }
                     ],
-    "benchTotalMs":  8,
-    "allPass":  true,
-    "passCount":  90,
-    "failCount":  0,
+    "benchTotalMs":  9,
+    "allPass":  false,
+    "passCount":  93,
+    "failCount":  4,
     "checks":  [
                    {
                        "Phase":  "SPEED",
                        "Test":  "info",
                        "Pass":  true,
-                       "Detail":  "54.3 ms  exit=0  outLen=701  json=True",
-                       "Time":  "2026-11-13T16:33:21.7142676-05:00"
+                       "Detail":  "53.7 ms  exit=0  outLen=681  json=True",
+                       "Time":  "2026-11-19T10:40:13.9945758-05:00"
                    },
                    {
                        "Phase":  "SPEED",
                        "Test":  "sec",
                        "Pass":  true,
-                       "Detail":  "56.2 ms  exit=0  outLen=262  json=False",
-                       "Time":  "2026-11-13T16:33:21.7713743-05:00"
+                       "Detail":  "39.9 ms  exit=0  outLen=262  json=False",
+                       "Time":  "2026-11-19T10:40:14.0473425-05:00"
                    },
                    {
                        "Phase":  "SPEED",
                        "Test":  "names",
                        "Pass":  true,
-                       "Detail":  "56.9 ms  exit=0  outLen=38  json=False",
-                       "Time":  "2026-11-13T16:33:21.8317935-05:00"
+                       "Detail":  "43.4 ms  exit=0  outLen=17  json=False",
+                       "Time":  "2026-11-19T10:40:14.0967515-05:00"
                    },
                    {
                        "Phase":  "SPEED",
                        "Test":  "classes",
                        "Pass":  true,
-                       "Detail":  "78 ms  exit=0  outLen=10359  json=True",
-                       "Time":  "2026-11-13T16:33:21.9143499-05:00"
+                       "Detail":  "60.7 ms  exit=0  outLen=10349  json=True",
+                       "Time":  "2026-11-19T10:40:14.1633927-05:00"
                    },
                    {
                        "Phase":  "SPEED",
                        "Test":  "sum",
                        "Pass":  true,
-                       "Detail":  "98.7 ms  exit=0  outLen=88024  json=True",
-                       "Time":  "2026-11-13T16:33:22.0347767-05:00"
+                       "Detail":  "79.9 ms  exit=0  outLen=88017  json=True",
+                       "Time":  "2026-11-19T10:40:14.2563218-05:00"
                    },
                    {
                        "Phase":  "SPEED",
                        "Test":  "vt",
                        "Pass":  true,
-                       "Detail":  "61 ms  exit=0  outLen=1271  json=False",
-                       "Time":  "2026-11-13T16:33:22.1084802-05:00"
+                       "Detail":  "41.9 ms  exit=0  outLen=1271  json=False",
+                       "Time":  "2026-11-19T10:40:14.3064173-05:00"
                    },
                    {
                        "Phase":  "SPEED",
                        "Test":  "surprises --max 50",
                        "Pass":  true,
-                       "Detail":  "3190.3 ms  exit=0  outLen=19510  json=True",
-                       "Time":  "2026-11-13T16:33:25.3066443-05:00"
+                       "Detail":  "3485.5 ms  exit=0  outLen=20012  json=True",
+                       "Time":  "2026-11-19T10:40:17.7917001-05:00"
                    },
                    {
                        "Phase":  "SPEED",
                        "Test":  "bench",
                        "Pass":  true,
-                       "Detail":  "49.7 ms  exit=0  outLen=456  json=True",
-                       "Time":  "2026-11-13T16:33:25.3583982-05:00"
+                       "Detail":  "49.1 ms  exit=0  outLen=446  json=True",
+                       "Time":  "2026-11-19T10:40:17.8489258-05:00"
                    },
                    {
                        "Phase":  "SPEED",
                        "Test":  "batch -c",
                        "Pass":  true,
-                       "Detail":  "3168.1 ms  exit=0  outLen=30923  json=True",
-                       "Time":  "2026-11-13T16:33:28.5329093-05:00"
+                       "Detail":  "3507.2 ms  exit=0  outLen=31364  json=True",
+                       "Time":  "2026-11-19T10:40:21.3650232-05:00"
                    },
                    {
                        "Phase":  "ACCURACY",
                        "Test":  "corroborate vtable:0x..",
                        "Pass":  true,
-                       "Detail":  "44 ms  json=True  exit=0",
-                       "Time":  "2026-11-13T16:33:28.6445261-05:00"
+                       "Detail":  "44.9 ms  json=True  exit=0",
+                       "Time":  "2026-11-19T10:40:21.5347110-05:00"
                    },
                    {
                        "Phase":  "ACCURACY",
                        "Test":  "corroborate edge:0x..-\u003e0x..",
                        "Pass":  true,
-                       "Detail":  "47.9 ms  json=True  exit=0",
-                       "Time":  "2026-11-13T16:33:28.6948488-05:00"
+                       "Detail":  "59.8 ms  json=True  exit=0",
+                       "Time":  "2026-11-19T10:40:21.5965688-05:00"
                    },
                    {
                        "Phase":  "ACCURACY",
                        "Test":  "sigcheck \u003creal sig\u003e",
                        "Pass":  true,
-                       "Detail":  "50.3 ms  json=True  exit=0",
-                       "Time":  "2026-11-13T16:33:28.7514336-05:00"
+                       "Detail":  "62.7 ms  json=True  exit=0",
+                       "Time":  "2026-11-19T10:40:21.6639239-05:00"
                    },
                    {
                        "Phase":  "ACCURACY",
                        "Test":  "audit",
                        "Pass":  true,
-                       "Detail":  "43.5 ms  json=True  exit=0",
-                       "Time":  "2026-11-13T16:33:28.7983123-05:00"
+                       "Detail":  "48.7 ms  json=True  exit=0",
+                       "Time":  "2026-11-19T10:40:21.7151062-05:00"
                    },
                    {
                        "Phase":  "ACCURACY",
                        "Test":  "recipes import-trace kernel32",
                        "Pass":  true,
-                       "Detail":  "45 ms  json=True  exit=0",
-                       "Time":  "2026-11-13T16:33:28.8498482-05:00"
+                       "Detail":  "48.2 ms  json=True  exit=0",
+                       "Time":  "2026-11-19T10:40:21.7653497-05:00"
                    },
                    {
                        "Phase":  "ACCURACY",
                        "Test":  "recipes string-xref \"rdis\"",
                        "Pass":  true,
-                       "Detail":  "45.2 ms  json=True  exit=0",
-                       "Time":  "2026-11-13T16:33:28.8890024-05:00"
+                       "Detail":  "45.9 ms  json=True  exit=0",
+                       "Time":  "2026-11-19T10:40:21.8217905-05:00"
                    },
                    {
                        "Phase":  "ACCURACY",
                        "Test":  "recipes xref-graph 0x..",
                        "Pass":  true,
-                       "Detail":  "46 ms  json=True  exit=0",
-                       "Time":  "2026-11-13T16:33:28.9520192-05:00"
+                       "Detail":  "47.8 ms  json=True  exit=0",
+                       "Time":  "2026-11-19T10:40:21.8756079-05:00"
                    },
                    {
                        "Phase":  "ACCURACY",
                        "Test":  "sigcheck matches\u003e=1",
                        "Pass":  true,
-                       "Detail":  "matches=2 ok=False",
-                       "Time":  "2026-11-13T16:33:28.9560219-05:00"
+                       "Detail":  "matches=3 ok=False",
+                       "Time":  "2026-11-19T10:40:21.8820353-05:00"
                    },
                    {
                        "Phase":  "ACCURACY",
                        "Test":  "corroborate vtable verdict",
                        "Pass":  true,
-                       "Detail":  "verdict=corroborated",
-                       "Time":  "2026-11-13T16:33:28.9560219-05:00"
+                       "Detail":  "verdict=single-route",
+                       "Time":  "2026-11-19T10:40:21.8867242-05:00"
                    },
                    {
                        "Phase":  "ACCURACY",
                        "Test":  "corroborate edge verdict",
                        "Pass":  true,
                        "Detail":  "verdict=uncorroborated",
-                       "Time":  "2026-11-13T16:33:28.9560219-05:00"
+                       "Time":  "2026-11-19T10:40:21.8882734-05:00"
                    },
                    {
                        "Phase":  "ACCURACY",
                        "Test":  "audit broken==0",
+                       "Pass":  false,
+                       "Detail":  "broken=10 checked=10",
+                       "Time":  "2026-11-19T10:40:21.8913665-05:00"
+                   },
+                   {
+                       "Phase":  "NEW-FEATURE",
+                       "Test":  "fld rejects function address as displacement",
                        "Pass":  true,
-                       "Detail":  "broken=0 checked=12",
-                       "Time":  "2026-11-13T16:33:28.9560219-05:00"
+                       "Detail":  "exit=0 out=error: displacement 0x66d9af0 is larger than 0x10000; this looks like a function address, not a field offset. fld/rw expect small field displacements (e.g. 0xE0). Use `fn` or `callees` for function addresses.",
+                       "Time":  "2026-11-19T10:40:21.9322828-05:00"
+                   },
+                   {
+                       "Phase":  "NEW-FEATURE",
+                       "Test":  "rw rejects function address as displacement",
+                       "Pass":  true,
+                       "Detail":  "exit=0 out={\"error\":\"displacement 0x66d9af0 is larger than 0x10000; this looks like a function address, not a field offset. fld/rw expect small field displacements (e.g. 0xE0). Use `fn` or `callees` for function addresses.\"}",
+                       "Time":  "2026-11-19T10:40:21.9822992-05:00"
+                   },
+                   {
+                       "Phase":  "NEW-FEATURE",
+                       "Test":  "fld 0xE0 --w --max 10 normal case",
+                       "Pass":  true,
+                       "Detail":  "exit=0 outLen=656",
+                       "Time":  "2026-11-19T10:40:22.0313429-05:00"
+                   },
+                   {
+                       "Phase":  "NEW-FEATURE",
+                       "Test":  "struct-from-fn valid RVA returns required keys",
+                       "Pass":  true,
+                       "Detail":  "keysOk=True role=constructor",
+                       "Time":  "2026-11-19T10:40:22.0988278-05:00"
+                   },
+                   {
+                       "Phase":  "NEW-FEATURE",
+                       "Test":  "struct-from-fn role is valid enum",
+                       "Pass":  true,
+                       "Detail":  "role=constructor",
+                       "Time":  "2026-11-19T10:40:22.1068506-05:00"
+                   },
+                   {
+                       "Phase":  "NEW-FEATURE",
+                       "Test":  "struct-from-fn --depth 2 supported",
+                       "Pass":  true,
+                       "Detail":  "jsonOk=True exit=0",
+                       "Time":  "2026-11-19T10:40:22.1673874-05:00"
+                   },
+                   {
+                       "Phase":  "NEW-FEATURE",
+                       "Test":  "struct-from-fn invalid address returns error (no fake fallback)",
+                       "Pass":  true,
+                       "Detail":  "exit=0 out={\"error\":\"0x0 is not in executable memory: not a function\"}",
+                       "Time":  "2026-11-19T10:40:22.2280642-05:00"
                    },
                    {
                        "Phase":  "FUNCTIONAL",
                        "Test":  "60 commands registered",
                        "Pass":  true,
                        "Detail":  "count matches main.rs CMDS array",
-                       "Time":  "2026-11-13T16:33:28.9716468-05:00"
+                       "Time":  "2026-11-19T10:40:22.2326551-05:00"
                    },
                    {
                        "Phase":  "FUNCTIONAL",
                        "Test":  "cmd \u0027gobj\u0027",
                        "Pass":  true,
-                       "Detail":  "54.2 ms  json=True  lines=1",
-                       "Time":  "2026-11-13T16:33:29.0295413-05:00"
+                       "Detail":  "64.2 ms  json=True  lines=1",
+                       "Time":  "2026-11-19T10:40:22.3010781-05:00"
                    },
                    {
                        "Phase":  "FUNCTIONAL",
                        "Test":  "cmd \u0027ptables\u0027",
                        "Pass":  true,
-                       "Detail":  "59 ms  json=True  lines=1",
-                       "Time":  "2026-11-13T16:33:29.0985138-05:00"
+                       "Detail":  "54.5 ms  json=True  lines=1",
+                       "Time":  "2026-11-19T10:40:22.3652351-05:00"
                    },
                    {
                        "Phase":  "FUNCTIONAL",
                        "Test":  "cmd \u0027structm\u0027",
                        "Pass":  true,
-                       "Detail":  "52.2 ms  json=True  lines=1",
-                       "Time":  "2026-11-13T16:33:29.1525195-05:00"
+                       "Detail":  "49.4 ms  json=True  lines=1",
+                       "Time":  "2026-11-19T10:40:22.4153815-05:00"
                    },
                    {
                        "Phase":  "FUNCTIONAL",
                        "Test":  "cmd \u0027worklist\u0027",
                        "Pass":  true,
-                       "Detail":  "401 ms  json=True  lines=1",
-                       "Time":  "2026-11-13T16:33:29.5557073-05:00"
+                       "Detail":  "415.4 ms  json=True  lines=1",
+                       "Time":  "2026-11-19T10:40:22.8354589-05:00"
                    },
                    {
                        "Phase":  "FUNCTIONAL",
                        "Test":  "cmd \u0027observe\u0027",
                        "Pass":  true,
-                       "Detail":  "41.4 ms  json=True  lines=1",
-                       "Time":  "2026-11-13T16:33:29.5885060-05:00"
+                       "Detail":  "52.6 ms  json=True  lines=1",
+                       "Time":  "2026-11-19T10:40:22.8827684-05:00"
                    },
                    {
                        "Phase":  "FUNCTIONAL",
                        "Test":  "cmd \u0027portfacts\u0027",
                        "Pass":  true,
-                       "Detail":  "43.4 ms  json=True  lines=1",
-                       "Time":  "2026-11-13T16:33:29.6446631-05:00"
+                       "Detail":  "50.8 ms  json=True  lines=1",
+                       "Time":  "2026-11-19T10:40:22.9409843-05:00"
                    },
                    {
                        "Phase":  "FUNCTIONAL",
                        "Test":  "cmd \u0027port\u0027",
                        "Pass":  true,
-                       "Detail":  "43.6 ms  json=True  lines=1",
-                       "Time":  "2026-11-13T16:33:29.6814526-05:00"
+                       "Detail":  "46.3 ms  json=True  lines=1",
+                       "Time":  "2026-11-19T10:40:22.9910667-05:00"
                    },
                    {
                        "Phase":  "FUNCTIONAL",
                        "Test":  "cmd \u0027abi\u0027",
                        "Pass":  true,
-                       "Detail":  "46.6 ms  json=True  lines=1",
-                       "Time":  "2026-11-13T16:33:29.7403199-05:00"
+                       "Detail":  "57.8 ms  json=True  lines=1",
+                       "Time":  "2026-11-19T10:40:23.0550235-05:00"
                    },
                    {
                        "Phase":  "FUNCTIONAL",
                        "Test":  "cmd \u0027sigcheck\u0027",
                        "Pass":  true,
-                       "Detail":  "52.7 ms  json=True  lines=1",
-                       "Time":  "2026-11-13T16:33:29.7859912-05:00"
+                       "Detail":  "50.4 ms  json=True  lines=1",
+                       "Time":  "2026-11-19T10:40:23.1074771-05:00"
                    },
                    {
                        "Phase":  "FUNCTIONAL",
                        "Test":  "cmd \u0027hookpoints\u0027",
                        "Pass":  true,
-                       "Detail":  "43.3 ms  json=True  lines=1",
-                       "Time":  "2026-11-13T16:33:29.8318146-05:00"
+                       "Detail":  "42.1 ms  json=True  lines=1",
+                       "Time":  "2026-11-19T10:40:23.1490975-05:00"
                    },
                    {
                        "Phase":  "FUNCTIONAL",
                        "Test":  "cmd \u0027flow\u0027",
                        "Pass":  true,
-                       "Detail":  "50.7 ms  json=True  lines=1",
-                       "Time":  "2026-11-13T16:33:29.8903853-05:00"
+                       "Detail":  "53.3 ms  json=True  lines=1",
+                       "Time":  "2026-11-19T10:40:23.2001734-05:00"
                    },
                    {
                        "Phase":  "FUNCTIONAL",
                        "Test":  "cmd \u0027contradict\u0027",
                        "Pass":  true,
-                       "Detail":  "53.1 ms  json=True  lines=1",
-                       "Time":  "2026-11-13T16:33:29.9538893-05:00"
+                       "Detail":  "55 ms  json=True  lines=1",
+                       "Time":  "2026-11-19T10:40:23.2586188-05:00"
                    },
                    {
                        "Phase":  "FUNCTIONAL",
                        "Test":  "cmd \u0027surprises\u0027",
                        "Pass":  true,
-                       "Detail":  "3156.2 ms  json=True  lines=1",
-                       "Time":  "2026-11-13T16:33:33.1115011-05:00"
+                       "Detail":  "3613.5 ms  json=True  lines=1",
+                       "Time":  "2026-11-19T10:40:26.8772100-05:00"
                    },
                    {
                        "Phase":  "FUNCTIONAL",
                        "Test":  "cmd \u0027corroborate\u0027",
                        "Pass":  true,
-                       "Detail":  "42.4 ms  json=True  lines=1",
-                       "Time":  "2026-11-13T16:33:33.1512154-05:00"
+                       "Detail":  "44.9 ms  json=True  lines=1",
+                       "Time":  "2026-11-19T10:40:26.9253985-05:00"
                    },
                    {
                        "Phase":  "FUNCTIONAL",
                        "Test":  "cmd \u0027investigate\u0027",
                        "Pass":  true,
-                       "Detail":  "54.6 ms  json=True  lines=1",
-                       "Time":  "2026-11-13T16:33:33.2035038-05:00"
+                       "Detail":  "63.1 ms  json=True  lines=1",
+                       "Time":  "2026-11-19T10:40:26.9910133-05:00"
                    },
                    {
                        "Phase":  "FUNCTIONAL",
                        "Test":  "cmd \u0027recipes\u0027",
                        "Pass":  true,
-                       "Detail":  "41.7 ms  json=True  lines=1",
-                       "Time":  "2026-11-13T16:33:33.2587188-05:00"
+                       "Detail":  "39.2 ms  json=True  lines=1",
+                       "Time":  "2026-11-19T10:40:27.0346493-05:00"
                    },
                    {
                        "Phase":  "FUNCTIONAL",
                        "Test":  "cmd \u0027bench\u0027",
                        "Pass":  true,
-                       "Detail":  "49.6 ms  json=True  lines=1",
-                       "Time":  "2026-11-13T16:33:33.3254726-05:00"
+                       "Detail":  "62.7 ms  json=True  lines=1",
+                       "Time":  "2026-11-19T10:40:27.1062017-05:00"
                    },
                    {
                        "Phase":  "FUNCTIONAL",
                        "Test":  "cmd \u0027needs\u0027",
                        "Pass":  true,
-                       "Detail":  "44.2 ms  json=True  lines=1",
-                       "Time":  "2026-11-13T16:33:33.3757198-05:00"
+                       "Detail":  "45.9 ms  json=True  lines=1",
+                       "Time":  "2026-11-19T10:40:27.1495486-05:00"
                    },
                    {
                        "Phase":  "FUNCTIONAL",
                        "Test":  "cmd \u0027decide\u0027",
                        "Pass":  true,
-                       "Detail":  "52.3 ms  json=True  lines=1",
-                       "Time":  "2026-11-13T16:33:33.4220658-05:00"
+                       "Detail":  "49.1 ms  json=True  lines=1",
+                       "Time":  "2026-11-19T10:40:27.2001023-05:00"
                    },
                    {
                        "Phase":  "FUNCTIONAL",
                        "Test":  "cmd \u0027choke\u0027",
                        "Pass":  true,
-                       "Detail":  "43.7 ms  json=True  lines=1",
-                       "Time":  "2026-11-13T16:33:33.4719690-05:00"
+                       "Detail":  "43.4 ms  json=True  lines=1",
+                       "Time":  "2026-11-19T10:40:27.2501840-05:00"
                    },
                    {
                        "Phase":  "FUNCTIONAL",
                        "Test":  "cmd \u0027common\u0027",
                        "Pass":  true,
-                       "Detail":  "44.1 ms  json=True  lines=1",
-                       "Time":  "2026-11-13T16:33:33.5228815-05:00"
+                       "Detail":  "42.2 ms  json=True  lines=1",
+                       "Time":  "2026-11-19T10:40:27.2910873-05:00"
                    },
                    {
                        "Phase":  "FUNCTIONAL",
                        "Test":  "cmd \u0027uses\u0027",
                        "Pass":  true,
-                       "Detail":  "43.3 ms  json=True  lines=1",
-                       "Time":  "2026-11-13T16:33:33.5585539-05:00"
+                       "Detail":  "41.9 ms  json=True  lines=1",
+                       "Time":  "2026-11-19T10:40:27.3360850-05:00"
                    },
                    {
                        "Phase":  "FUNCTIONAL",
                        "Test":  "cmd \u0027anchors\u0027",
                        "Pass":  true,
-                       "Detail":  "50.9 ms  json=True  lines=1",
-                       "Time":  "2026-11-13T16:33:33.6211571-05:00"
+                       "Detail":  "54.4 ms  json=True  lines=1",
+                       "Time":  "2026-11-19T10:40:27.3912368-05:00"
                    },
                    {
                        "Phase":  "FUNCTIONAL",
                        "Test":  "cmd \u0027comps\u0027",
                        "Pass":  true,
-                       "Detail":  "48.4 ms  json=True  lines=1",
-                       "Time":  "2026-11-13T16:33:33.6571387-05:00"
+                       "Detail":  "48.1 ms  json=True  lines=1",
+                       "Time":  "2026-11-19T10:40:27.4412408-05:00"
                    },
                    {
                        "Phase":  "FUNCTIONAL",
                        "Test":  "cmd \u0027sum\u0027",
                        "Pass":  true,
-                       "Detail":  "50.6 ms  json=True  lines=1",
-                       "Time":  "2026-11-13T16:33:33.7461077-05:00"
+                       "Detail":  "53 ms  json=True  lines=1",
+                       "Time":  "2026-11-19T10:40:27.5268508-05:00"
                    },
                    {
                        "Phase":  "FUNCTIONAL",
                        "Test":  "cmd \u0027cfg\u0027",
                        "Pass":  true,
-                       "Detail":  "51.9 ms  json=True  lines=1",
-                       "Time":  "2026-11-13T16:33:33.8070200-05:00"
+                       "Detail":  "52.5 ms  json=True  lines=1",
+                       "Time":  "2026-11-19T10:40:27.5846130-05:00"
                    },
                    {
                        "Phase":  "FUNCTIONAL",
                        "Test":  "cmd \u0027gates\u0027",
                        "Pass":  true,
-                       "Detail":  "48.4 ms  json=True  lines=1",
-                       "Time":  "2026-11-13T16:33:33.8492649-05:00"
+                       "Detail":  "51.3 ms  json=True  lines=1",
+                       "Time":  "2026-11-19T10:40:27.6383565-05:00"
                    },
                    {
                        "Phase":  "FUNCTIONAL",
                        "Test":  "cmd \u0027path\u0027",
                        "Pass":  true,
-                       "Detail":  "43.6 ms  json=True  lines=1",
-                       "Time":  "2026-11-13T16:33:33.8962187-05:00"
+                       "Detail":  "51.7 ms  json=True  lines=1",
+                       "Time":  "2026-11-19T10:40:27.6923163-05:00"
                    },
                    {
                        "Phase":  "FUNCTIONAL",
                        "Test":  "cmd \u0027reach\u0027",
                        "Pass":  true,
-                       "Detail":  "57.6 ms  json=True  lines=1",
-                       "Time":  "2026-11-13T16:33:33.9581728-05:00"
+                       "Detail":  "76.8 ms  json=True  lines=1",
+                       "Time":  "2026-11-19T10:40:27.7708305-05:00"
                    },
                    {
                        "Phase":  "FUNCTIONAL",
                        "Test":  "cmd \u0027classes\u0027",
                        "Pass":  true,
-                       "Detail":  "58 ms  json=True  lines=1",
-                       "Time":  "2026-11-13T16:33:34.0217849-05:00"
+                       "Detail":  "73.6 ms  json=True  lines=1",
+                       "Time":  "2026-11-19T10:40:27.8513607-05:00"
                    },
                    {
                        "Phase":  "FUNCTIONAL",
                        "Test":  "cmd \u0027class\u0027",
                        "Pass":  true,
-                       "Detail":  "44.7 ms  json=True  lines=1",
-                       "Time":  "2026-11-13T16:33:34.0585959-05:00"
+                       "Detail":  "52.1 ms  json=True  lines=1",
+                       "Time":  "2026-11-19T10:40:27.9033416-05:00"
                    },
                    {
                        "Phase":  "FUNCTIONAL",
                        "Test":  "cmd \u0027vslot\u0027",
                        "Pass":  true,
-                       "Detail":  "54.1 ms  json=True  lines=1",
-                       "Time":  "2026-11-13T16:33:34.1211016-05:00"
+                       "Detail":  "56.9 ms  json=True  lines=1",
+                       "Time":  "2026-11-19T10:40:27.9637254-05:00"
                    },
                    {
                        "Phase":  "FUNCTIONAL",
                        "Test":  "cmd \u0027vcalls\u0027",
                        "Pass":  true,
-                       "Detail":  "48.3 ms  json=True  lines=1",
-                       "Time":  "2026-11-13T16:33:34.1758102-05:00"
+                       "Detail":  "51.2 ms  json=True  lines=1",
+                       "Time":  "2026-11-19T10:40:28.0131320-05:00"
                    },
                    {
                        "Phase":  "FUNCTIONAL",
                        "Test":  "cmd \u0027rw\u0027",
                        "Pass":  true,
-                       "Detail":  "179.8 ms  json=True  lines=1",
-                       "Time":  "2026-11-13T16:33:34.3926977-05:00"
+                       "Detail":  "185.7 ms  json=True  lines=1",
+                       "Time":  "2026-11-19T10:40:28.2281206-05:00"
                    },
                    {
                        "Phase":  "FUNCTIONAL",
                        "Test":  "cmd \u0027struct\u0027",
                        "Pass":  true,
-                       "Detail":  "50.7 ms  json=True  lines=1",
-                       "Time":  "2026-11-13T16:33:34.4449882-05:00"
+                       "Detail":  "53.4 ms  json=True  lines=1",
+                       "Time":  "2026-11-19T10:40:28.2847663-05:00"
                    },
                    {
                        "Phase":  "FUNCTIONAL",
                        "Test":  "cmd \u0027system\u0027",
                        "Pass":  true,
-                       "Detail":  "46.5 ms  json=True  lines=1",
-                       "Time":  "2026-11-13T16:33:34.4870735-05:00"
+                       "Detail":  "51.2 ms  json=True  lines=1",
+                       "Time":  "2026-11-19T10:40:28.3345689-05:00"
                    },
                    {
                        "Phase":  "FUNCTIONAL",
                        "Test":  "cmd \u0027assert\u0027",
                        "Pass":  true,
-                       "Detail":  "58.8 ms  json=True  lines=1",
-                       "Time":  "2026-11-13T16:33:34.5460927-05:00"
+                       "Detail":  "48.3 ms  json=True  lines=1",
+                       "Time":  "2026-11-19T10:40:28.3949093-05:00"
                    },
                    {
                        "Phase":  "FUNCTIONAL",
                        "Test":  "cmd \u0027retract\u0027",
                        "Pass":  true,
-                       "Detail":  "43.8 ms  json=True  lines=1",
-                       "Time":  "2026-11-13T16:33:34.5927038-05:00"
+                       "Detail":  "46.7 ms  json=True  lines=1",
+                       "Time":  "2026-11-19T10:40:28.4433434-05:00"
                    },
                    {
                        "Phase":  "FUNCTIONAL",
                        "Test":  "cmd \u0027contest\u0027",
                        "Pass":  true,
-                       "Detail":  "44.3 ms  json=True  lines=1",
-                       "Time":  "2026-11-13T16:33:34.6455609-05:00"
+                       "Detail":  "45.1 ms  json=True  lines=1",
+                       "Time":  "2026-11-19T10:40:28.4799560-05:00"
                    },
                    {
                        "Phase":  "FUNCTIONAL",
                        "Test":  "cmd \u0027facts\u0027",
                        "Pass":  true,
-                       "Detail":  "43.3 ms  json=True  lines=1",
-                       "Time":  "2026-11-13T16:33:34.6768138-05:00"
+                       "Detail":  "42.8 ms  json=True  lines=1",
+                       "Time":  "2026-11-19T10:40:28.5345454-05:00"
                    },
                    {
                        "Phase":  "FUNCTIONAL",
                        "Test":  "cmd \u0027why\u0027",
                        "Pass":  true,
-                       "Detail":  "53.6 ms  json=True  lines=1",
-                       "Time":  "2026-11-13T16:33:34.7467481-05:00"
+                       "Detail":  "49.9 ms  json=True  lines=1",
+                       "Time":  "2026-11-19T10:40:28.5829812-05:00"
                    },
                    {
                        "Phase":  "FUNCTIONAL",
                        "Test":  "cmd \u0027audit\u0027",
                        "Pass":  true,
-                       "Detail":  "45.7 ms  json=True  lines=1",
-                       "Time":  "2026-11-13T16:33:34.7934003-05:00"
+                       "Detail":  "41.1 ms  json=True  lines=1",
+                       "Time":  "2026-11-19T10:40:28.6262495-05:00"
                    },
                    {
                        "Phase":  "FUNCTIONAL",
                        "Test":  "cmd \u0027info\u0027",
                        "Pass":  true,
-                       "Detail":  "47.2 ms  json=True  lines=1",
-                       "Time":  "2026-11-13T16:33:34.8459129-05:00"
+                       "Detail":  "39.7 ms  json=True  lines=1",
+                       "Time":  "2026-11-19T10:40:28.6606865-05:00"
                    },
                    {
                        "Phase":  "FUNCTIONAL",
                        "Test":  "cmd \u0027fn\u0027",
                        "Pass":  true,
-                       "Detail":  "52.4 ms  outLen=12631",
-                       "Time":  "2026-11-13T16:33:34.8976552-05:00"
+                       "Detail":  "46.1 ms  outLen=12631",
+                       "Time":  "2026-11-19T10:40:28.7153160-05:00"
                    },
                    {
                        "Phase":  "FUNCTIONAL",
                        "Test":  "cmd \u0027ptr\u0027",
                        "Pass":  true,
-                       "Detail":  "46.7 ms  outLen=16",
-                       "Time":  "2026-11-13T16:33:34.9394234-05:00"
+                       "Detail":  "41.3 ms  outLen=16",
+                       "Time":  "2026-11-19T10:40:28.7597666-05:00"
                    },
                    {
                        "Phase":  "FUNCTIONAL",
                        "Test":  "cmd \u0027comp\u0027",
                        "Pass":  true,
-                       "Detail":  "55.5 ms  json=True  lines=1",
-                       "Time":  "2026-11-13T16:33:34.9939812-05:00"
+                       "Detail":  "56.1 ms  json=True  lines=1",
+                       "Time":  "2026-11-19T10:40:28.8202322-05:00"
                    },
                    {
                        "Phase":  "FUNCTIONAL",
                        "Test":  "cmd \u0027dis\u0027",
                        "Pass":  true,
-                       "Detail":  "43.2 ms  outLen=299",
-                       "Time":  "2026-11-13T16:33:35.0478425-05:00"
+                       "Detail":  "59.1 ms  outLen=299",
+                       "Time":  "2026-11-19T10:40:28.8839471-05:00"
                    },
                    {
                        "Phase":  "FUNCTIONAL",
                        "Test":  "cmd \u0027xr\u0027",
                        "Pass":  true,
-                       "Detail":  "42.2 ms  outLen=65",
-                       "Time":  "2026-11-13T16:33:35.0947217-05:00"
+                       "Detail":  "54.4 ms  outLen=65",
+                       "Time":  "2026-11-19T10:40:28.9376977-05:00"
                    },
                    {
                        "Phase":  "FUNCTIONAL",
                        "Test":  "cmd \u0027callers\u0027",
                        "Pass":  true,
-                       "Detail":  "51.3 ms  outLen=71",
-                       "Time":  "2026-11-13T16:33:35.1398022-05:00"
+                       "Detail":  "57.1 ms  outLen=71",
+                       "Time":  "2026-11-19T10:40:28.9956411-05:00"
                    },
                    {
                        "Phase":  "FUNCTIONAL",
                        "Test":  "cmd \u0027callees\u0027",
                        "Pass":  true,
-                       "Detail":  "40.4 ms  outLen=2498",
-                       "Time":  "2026-11-13T16:33:35.1789862-05:00"
+                       "Detail":  "46.5 ms  outLen=2498",
+                       "Time":  "2026-11-19T10:40:29.0443482-05:00"
                    },
                    {
                        "Phase":  "FUNCTIONAL",
                        "Test":  "cmd \u0027str\u0027",
                        "Pass":  true,
-                       "Detail":  "49.1 ms  outLen=206",
-                       "Time":  "2026-11-13T16:33:35.2399116-05:00"
+                       "Detail":  "52.5 ms  outLen=206",
+                       "Time":  "2026-11-19T10:40:29.1001342-05:00"
                    },
                    {
                        "Phase":  "FUNCTIONAL",
                        "Test":  "cmd \u0027fld\u0027",
                        "Pass":  true,
-                       "Detail":  "38.7 ms  outLen=32",
-                       "Time":  "2026-11-13T16:33:35.2798324-05:00"
+                       "Detail":  "46.4 ms  outLen=32",
+                       "Time":  "2026-11-19T10:40:29.1467182-05:00"
                    },
                    {
                        "Phase":  "FUNCTIONAL",
                        "Test":  "cmd \u0027imm\u0027",
                        "Pass":  true,
-                       "Detail":  "38 ms  outLen=25",
-                       "Time":  "2026-11-13T16:33:35.3111115-05:00"
+                       "Detail":  "46.3 ms  outLen=25",
+                       "Time":  "2026-11-19T10:40:29.1987906-05:00"
                    },
                    {
                        "Phase":  "FUNCTIONAL",
                        "Test":  "cmd \u0027vt\u0027",
                        "Pass":  true,
-                       "Detail":  "41.4 ms  outLen=354",
-                       "Time":  "2026-11-13T16:33:35.3571678-05:00"
+                       "Detail":  "46.5 ms  outLen=354",
+                       "Time":  "2026-11-19T10:40:29.2377003-05:00"
                    },
                    {
                        "Phase":  "FUNCTIONAL",
                        "Test":  "cmd \u0027find\u0027",
                        "Pass":  true,
-                       "Detail":  "50.2 ms  outLen=52",
-                       "Time":  "2026-11-13T16:33:35.4071585-05:00"
+                       "Detail":  "59.5 ms  outLen=71",
+                       "Time":  "2026-11-19T10:40:29.2964584-05:00"
                    },
                    {
                        "Phase":  "FUNCTIONAL",
                        "Test":  "cmd \u0027name\u0027",
                        "Pass":  true,
-                       "Detail":  "62 ms  json=True  lines=1",
-                       "Time":  "2026-11-13T16:33:35.4712595-05:00"
+                       "Detail":  "62.7 ms  json=True  lines=1",
+                       "Time":  "2026-11-19T10:40:29.3662326-05:00"
                    },
                    {
                        "Phase":  "FUNCTIONAL",
                        "Test":  "cmd \u0027names\u0027",
                        "Pass":  true,
-                       "Detail":  "37.1 ms  outLen=32",
-                       "Time":  "2026-11-13T16:33:35.5181384-05:00"
+                       "Detail":  "37.8 ms  outLen=34",
+                       "Time":  "2026-11-19T10:40:29.4015694-05:00"
                    },
                    {
                        "Phase":  "FUNCTIONAL",
                        "Test":  "cmd \u0027sec\u0027",
                        "Pass":  true,
-                       "Detail":  "37.2 ms  outLen=262",
-                       "Time":  "2026-11-13T16:33:35.5583911-05:00"
+                       "Detail":  "37.9 ms  outLen=262",
+                       "Time":  "2026-11-19T10:40:29.4466175-05:00"
                    },
                    {
                        "Phase":  "FUNCTIONAL",
                        "Test":  "cmd \u0027help\u0027",
                        "Pass":  true,
-                       "Detail":  "46.9 ms  outLen=1483",
-                       "Time":  "2026-11-13T16:33:35.5961570-05:00"
+                       "Detail":  "43.2 ms  outLen=1926",
+                       "Time":  "2026-11-19T10:40:29.4949800-05:00"
                    },
                    {
                        "Phase":  "FUNCTIONAL",
                        "Test":  "cmd \u0027?\u0027",
                        "Pass":  true,
-                       "Detail":  "43.5 ms  outLen=1483",
-                       "Time":  "2026-11-13T16:33:35.6505337-05:00"
+                       "Detail":  "43.6 ms  outLen=1926",
+                       "Time":  "2026-11-19T10:40:29.5419338-05:00"
                    },
                    {
                        "Phase":  "FUNCTIONAL",
                        "Test":  "60 commands JSON/output",
                        "Pass":  true,
                        "Detail":  "passed=60 failed=0",
-                       "Time":  "2026-11-13T16:33:35.6505337-05:00"
+                       "Time":  "2026-11-19T10:40:29.5444556-05:00"
                    },
                    {
                        "Phase":  "ERROR-HANDLING",
                        "Test":  "bad address (sum 0xDEADBEEF)",
                        "Pass":  true,
-                       "Detail":  "38.8 ms  exit=2  startFailed=False  jsonError=False",
-                       "Time":  "2026-11-13T16:33:35.6974413-05:00"
+                       "Detail":  "54.7 ms  exit=2  startFailed=False  jsonError=False",
+                       "Time":  "2026-11-19T10:40:29.5973067-05:00"
                    },
                    {
                        "Phase":  "ERROR-HANDLING",
                        "Test":  "missing file",
                        "Pass":  true,
-                       "Detail":  "34.3 ms  exit=2  startFailed=False  jsonError=False",
-                       "Time":  "2026-11-13T16:33:35.7220664-05:00"
+                       "Detail":  "34.6 ms  exit=2  startFailed=False  jsonError=False",
+                       "Time":  "2026-11-19T10:40:29.6366597-05:00"
                    },
                    {
                        "Phase":  "ERROR-HANDLING",
                        "Test":  "invalid signature (sigcheck zz)",
                        "Pass":  true,
-                       "Detail":  "33.3 ms  exit=2  startFailed=False  jsonError=False",
-                       "Time":  "2026-11-13T16:33:35.7645487-05:00"
+                       "Detail":  "34.3 ms  exit=2  startFailed=False  jsonError=False",
+                       "Time":  "2026-11-19T10:40:29.6790614-05:00"
                    },
                    {
                        "Phase":  "PERSISTENCE",
                        "Test":  "assert accepted",
                        "Pass":  true,
-                       "Detail":  "id=28",
-                       "Time":  "2026-11-13T16:33:35.8194100-05:00"
+                       "Detail":  "id=34",
+                       "Time":  "2026-11-19T10:40:29.7472638-05:00"
                    },
                    {
                        "Phase":  "PERSISTENCE",
                        "Test":  "fact visible in facts (same process)",
-                       "Pass":  true,
+                       "Pass":  false,
                        "Detail":  "",
-                       "Time":  "2026-11-13T16:33:35.8866074-05:00"
+                       "Time":  "2026-11-19T10:40:29.8197674-05:00"
                    },
                    {
                        "Phase":  "PERSISTENCE",
                        "Test":  "facts survive reload (active_facts\u003e=1)",
                        "Pass":  true,
-                       "Detail":  "active_facts=20",
-                       "Time":  "2026-11-13T16:33:35.9409722-05:00"
+                       "Detail":  "active_facts=19",
+                       "Time":  "2026-11-19T10:40:29.8606946-05:00"
                    },
                    {
                        "Phase":  "PERSISTENCE",
                        "Test":  "fact visible after re-run (new process)",
-                       "Pass":  true,
+                       "Pass":  false,
                        "Detail":  "",
-                       "Time":  "2026-11-13T16:33:36.0029524-05:00"
+                       "Time":  "2026-11-19T10:40:29.9135281-05:00"
                    },
                    {
                        "Phase":  "PERSISTENCE",
                        "Test":  "overall SQLite persistence",
-                       "Pass":  true,
+                       "Pass":  false,
                        "Detail":  "",
-                       "Time":  "2026-11-13T16:33:36.0526363-05:00"
+                       "Time":  "2026-11-19T10:40:29.9625435-05:00"
                    }
                ],
-    "timestamp":  "2026-11-13T16:33:36.0839158-05:00"
+    "timestamp":  "2026-11-19T10:40:30.0120569-05:00"
 }

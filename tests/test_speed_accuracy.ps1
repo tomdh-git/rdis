@@ -18,7 +18,7 @@
 #===============================================================================
 [CmdletBinding()]
 param(
-    [string]$RdisExe   = "$PSScriptRoot/target/release/rdis.exe",
+    [string]$RdisExe   = if (Test-Path "$PSScriptRoot/../target/release/rdis.exe") { "$PSScriptRoot/../target/release/rdis.exe" } elseif (Test-Path "$PSScriptRoot/target/release/rdis.exe") { "$PSScriptRoot/target/release/rdis.exe" } else { "rdis.exe" },
     [string]$TestExe   = $null,
     [string]$ResultsOut= "$PSScriptRoot/test_speed_accuracy.results.json",
     [switch]$NoFail
