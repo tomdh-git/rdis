@@ -1,22 +1,25 @@
-name: CI
+name: CI & Release
 
 on:
   push:
     branches: [main, master]
+    tags: ["v*"]
   pull_request:
     branches: [main, master]
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  test:
+  build-and-test:
     name: Build & Test (Windows)
     runs-on: windows-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Rust toolchain
         uses: dtolnay/rust-toolchain@stable
@@ -30,9 +33,81 @@ jobs:
       - name: Run unit & integration tests
         run: cargo test --verbose
 
-      - name: Build release binary
+      - name: Build standalone release binary
         run: cargo build --release
 
       - name: Run CI integration test suite
         shell: pwsh
         run: ./tests/ci_test.ps1 -RdisExe ./target/release/rdis.exe
+
+      - name: Prepare release bundle & Changelog
+        if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v')) && github.event_name == 'push'
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path dist/bundle | Out-Null
+          Copy-Item target/release/rdis.exe dist/bundle/
+          Copy-Item README.md dist/bundle/
+
+          $isTag = $env:GITHUB_REF.StartsWith("refs/tags/v")
+          $tag = if ($isTag) { $env:GITHUB_REF_NAME } else { "latest" }
+          $zipName = "rdis-${tag}-windows-x86_64.zip"
+          Compress-Archive -Path dist/bundle/* -DestinationPath "dist/$zipName" -Force
+
+          # Extract commit messages
+          if ($isTag) {
+            $prevTag = git describe --tags --abbrev=0 "${tag}^" 2>$null
+            if ($prevTag) {
+              $commits = (git log "${prevTag}..HEAD" --oneline) | ForEach-Object { "* $_" }
+              $log = $commits -join "`n"
+              $body = "## 🚀 What's Changed since $prevTag`n`n$log`n`n---`n*Standalone portable x86_64 PE static analysis binary.*"
+            } else {
+              $commits = (git log -n 15 --oneline) | ForEach-Object { "* $_" }
+              $log = $commits -join "`n"
+              $body = "## 🚀 What's Changed in $tag`n`n$log`n`n---`n*Standalone portable x86_64 PE static analysis binary.*"
+            }
+          } else {
+            $commits = (git log -n 10 --oneline) | ForEach-Object { "* $_" }
+            $log = $commits -join "`n"
+            $body = "## 🚀 Recent Changes (Rolling Latest)`n`n$log`n`n---`n*Standalone portable x86_64 PE static analysis binary. Statically linked CRT.*"
+          }
+
+          Set-Content -Path dist/CHANGELOG.md -Value $body -Encoding utf8
+          "ZIP_NAME=$zipName" >> $env:GITHUB_ENV
+
+      - name: Upload artifact
+        if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v')) && github.event_name == 'push'
+        uses: actions/upload-artifact@v4
+        with:
+          name: rdis-binary
+          path: |
+            dist/${{ env.ZIP_NAME }}
+            target/release/rdis.exe
+            dist/CHANGELOG.md
+
+      # Publish Tagged Release (e.g. v0.1.0)
+      - name: Publish Tagged Release
+        if: startsWith(github.ref, 'refs/tags/v') && github.event_name == 'push'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: "rdis ${{ github.ref_name }}"
+          body_path: dist/CHANGELOG.md
+          make_latest: true
+          prerelease: ${{ contains(github.ref_name, 'alpha') || contains(github.ref_name, 'beta') || contains(github.ref_name, 'rc') }}
+          files: |
+            dist/${{ env.ZIP_NAME }}
+            target/release/rdis.exe
+
+      # Publish Rolling Latest Pre-release on push to main
+      - name: Publish Rolling Latest Release
+        if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master') && github.event_name == 'push'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          name: "rdis (Rolling Latest)"
+          body_path: dist/CHANGELOG.md
+          make_latest: true
+          prerelease: true
+          files: |
+            dist/${{ env.ZIP_NAME }}
+            target/release/rdis.exe

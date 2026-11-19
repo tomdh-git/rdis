@@ -26,3 +26,6 @@ tests/test_speed_accuracy.results.json
 # Local analysis state (SQLite fact journals)
 names/*.facts.jsonl
 names/temp.facts.jsonl
+
+# Distribution bundles
+dist/
