@@ -45,3 +45,18 @@ fn test_rdis_sec_command() {
     assert!(stdout.contains(".text"));
     assert!(stdout.contains(".pdata"));
 }
+
+#[test]
+fn test_rdis_mksig_command_help() {
+    let rdis_bin = env!("CARGO_BIN_EXE_rdis");
+    let output = Command::new(rdis_bin)
+        .arg(rdis_bin)
+        .arg("mksig")
+        .output()
+        .expect("failed to execute rdis");
+
+    // Missing address argument produces error json or failure
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(stdout.contains("missing address") || stderr.contains("missing address") || stdout.contains("error"));
+}

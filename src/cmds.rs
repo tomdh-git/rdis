@@ -14,7 +14,7 @@ use std::thread;
 #[derive(Default)]
 pub struct Args { pub pos: Vec<String>, pub opt: HashMap<String, String>, pub flags: HashSet<String> }
 
-const BOOL_FLAGS: [&str; 8] = ["r", "w", "raw", "nochains", "i", "all", "json", "text"];
+const BOOL_FLAGS: [&str; 9] = ["r", "w", "raw", "nochains", "i", "all", "json", "text", "alt"];
 
 pub fn tokenize(line: &str) -> Vec<String> {
     let mut out = vec![];

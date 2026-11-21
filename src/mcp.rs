@@ -35,6 +35,7 @@ const TOOLS: &[(&str, &str)] = &[
     ("port", "Cross-build match: find this exe's function in ANOTHER exe by strings, type hashes, immediates, then verify (string-set jaccard, size, vcall slots, callee counts). Never above candidate/derived. args: <other-exe> <fn> [--top N]"),
     ("abi", "Hint: which register args are used, hidden return pointer (sret) guess. args: <fn>"),
     ("sigcheck", "Lint a byte signature (length, wildcards, CC, rel32 displacements) and count exact matches in this exe. args: <sig>"),
+    ("mksig", "Create a unique byte signature for a function: disassembles from the start, wildcards rip-relative and call/jmp displacements, extends until unique. args: <fn> [--max N] [--kind fn|call|vindex|offset|global] [--tier core|feature|cosmetic] [--mask OFF:VALUE:MASK] [--alt [SNIPPET]] [--vindex N]"),
     ("hookpoints", "Ranked hook candidates between A and B: chokepoints + target, by unique prologue, size, fan-in. args: <A> <B> [--virt ...]"),
     ("flow", "Interprocedural value flow: follow an argument (or a field read) through callees that receive it unchanged; reports compared/masked/indexed/stored/dereferenced uses. args: <fn> <arg 0-3> | <fn> --field <off> [--depth N]"),
     ("contradict", "Hypothesis check for a field: list every reader that violates the belief and the writers. args: <off> --class C | --fn F --as compare-only|not-indexed|not-stored"),

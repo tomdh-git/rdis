@@ -210,6 +210,158 @@ pub fn cmd_sigcheck(ctx: &mut Ctx, a: &Args) -> Result<Value, String> {
     Ok(json!({"length": n, "wildcards": wild, "matches": hits.len(), "hits": hit_json, "issues": issues, "ok": issues.is_empty(), "trust": "proven (the match count is an exhaustive scan of executable sections of THIS exe)"}))
 }
 
+// ---------------------------------------------------------------- mksig
+
+pub fn cmd_mksig(ctx: &mut Ctx, a: &Args) -> Result<Value, String> {
+    ctx.prep();
+    let f = crate::cmds::fn_arg(ctx, a, 0)?;
+    let max_bytes = a.num("max", 96);
+    let _ = ctx.pe.function_of(f).ok_or("address is not in a known function")?;
+
+    // tokenize: decode instructions and wildcard rip-relative displacements and call/jmp/jcc rel32 targets
+    let tokenize = |limit: usize| -> Vec<String> {
+        let code = ctx.pe.bytes(f, (limit + 128).max(400));
+        let mut dec = Decoder::with_ip(64, code, f as u64, DecoderOptions::NONE);
+        let mut tokens: Vec<String> = Vec::new();
+        let mut ins = Instruction::default();
+        while dec.can_decode() && tokens.len() < limit {
+            dec.decode_out(&mut ins);
+            let ofs = (ins.ip() as u32 - f) as usize;
+            let ilen = ins.len();
+            if ofs + ilen > code.len() { break; }
+            let raw = &code[ofs..ofs + ilen];
+            let mut wild = vec![false; ilen];
+            let co = dec.get_constant_offsets(&ins);
+
+            // wildcard rip-relative memory displacements (4 bytes)
+            if ins.is_ip_rel_memory_operand() && co.displacement_size() == 4 {
+                let d_off = co.displacement_offset() as usize;
+                if d_off + 4 <= ilen {
+                    for k in d_off..d_off + 4 { wild[k] = true; }
+                }
+            }
+
+            // wildcard call/jmp/jcc rel32 (4 bytes)
+            let fc = ins.flow_control();
+            if matches!(fc, FlowControl::Call | FlowControl::UnconditionalBranch | FlowControl::ConditionalBranch) {
+                if co.immediate_size() == 4 {
+                    let imm_off = co.immediate_offset() as usize;
+                    if imm_off + 4 <= ilen {
+                        for k in imm_off..imm_off + 4 { wild[k] = true; }
+                    }
+                }
+            }
+
+            for (k, &b) in raw.iter().enumerate() {
+                tokens.push(if wild[k] { "??".to_string() } else { format!("{:02X}", b) });
+            }
+        }
+        tokens
+    };
+
+    let tokens = tokenize(max_bytes);
+    let mut signature: Option<String> = None;
+    for n in 24..=tokens.len() {
+        let candidate = tokens[..n].join(" ");
+        let hits = crate::find_sig(ctx, &candidate);
+        if hits.len() == 1 {
+            signature = Some(candidate);
+            break;
+        }
+    }
+
+    let sig = match &signature {
+        Some(s) => s.clone(),
+        None => {
+            let total = tokens.len();
+            let hits = crate::find_sig(ctx, &tokens.join(" "));
+            return Ok(json!({"error": format!("no unique pattern in {} bytes ({} matches)", total, hits.len()), "fn": ctx.flabel(f)}));
+        }
+    };
+
+    // anchor: auto-extract a secondary unique window (like --alt in mksig.py)
+    let mut anchor: Option<String> = None;
+    if a.flags.contains("alt") || a.s("alt").is_some() {
+        if let Some(snippet) = a.s("alt") {
+            // user-supplied anchor snippet
+            let parsed: Vec<String> = snippet.split_whitespace()
+                .map(|t| if t == "?" || t == "??" { "??".to_string() } else { format!("{:02X}", u8::from_str_radix(t, 16).unwrap_or(0)) })
+                .collect();
+            let hits = crate::find_sig(ctx, &parsed.join(" "));
+            if hits.len() == 1 {
+                anchor = Some(parsed.join(" "));
+            } else {
+                return Ok(json!({"error": format!("anchor snippet matches {} places (need exactly 1)", hits.len()), "sig": sig, "fn": ctx.flabel(f)}));
+            }
+        } else {
+            // auto-extract: scan wider instruction window for a unique sub-pattern
+            let wide = tokenize(400);
+            'outer: for length in [32usize, 28, 24, 20, 16, 12] {
+                for start in (4..wide.len().saturating_sub(length).min(160) + 1).step_by(2) {
+                    let candidate = wide[start..start + length].join(" ");
+                    if candidate != sig && crate::find_sig(ctx, &candidate).len() == 1 {
+                        anchor = Some(candidate);
+                        break 'outer;
+                    }
+                }
+            }
+        }
+    }
+
+    // JSON leaf mode: when any schema flag is provided
+    let kind = a.s("kind").unwrap_or("fn");
+    let tier = a.s("tier").unwrap_or("core");
+    let json_mode = a.s("kind").is_some() || a.s("tier").is_some() || a.s("mask").is_some()
+        || a.flags.contains("alt") || a.s("alt").is_some() || a.s("vindex").is_some();
+
+    if !json_mode {
+        // simple mode: return just the sig + metadata
+        return Ok(json!({
+            "fn": ctx.flabel(f),
+            "sig": sig,
+            "length": sig.split_whitespace().count(),
+            "wildcards": sig.split_whitespace().filter(|t| *t == "??").count(),
+        }));
+    }
+
+    // build the full Sigs.json leaf
+    let mut leaf = json!({
+        "priority": "high",
+        "kind": kind,
+        "tier": tier,
+        "sigs": [sig],
+    });
+
+    if let Some(mask_str) = a.s("mask") {
+        // parse mask OFF:VALUE:MASK
+        let parts: Vec<&str> = mask_str.split(':').collect();
+        if parts.len() == 3 {
+            let hexadecimal = parts.iter().any(|p| p.starts_with("0x") || p.chars().any(|c| "abcdefABCDEF".contains(c)));
+            let base = if hexadecimal { 16 } else { 10 };
+            if let (Ok(off), Ok(value), Ok(mask)) = (
+                u32::from_str_radix(parts[0].trim_start_matches("0x"), base),
+                u32::from_str_radix(parts[1].trim_start_matches("0x"), base),
+                u32::from_str_radix(parts[2].trim_start_matches("0x"), base),
+            ) {
+                leaf["mask"] = json!([{"off": off, "value": value, "mask": mask}]);
+            }
+        }
+    }
+    if let Some(a) = &anchor {
+        leaf["anchor"] = json!(a);
+    }
+    if let Some(vi) = a.s("vindex") {
+        if let Ok(v) = vi.parse::<u32>() {
+            leaf["vindex"] = json!(v);
+        }
+    }
+
+    Ok(json!({"fn": ctx.flabel(f), "leaf": leaf, "sig": leaf["sigs"][0],
+        "anchor": anchor.as_deref().unwrap_or("(none)"),
+        "length": sig.split_whitespace().count(),
+        "wildcards": sig.split_whitespace().filter(|t| *t == "??").count()}))
+}
+
 // ---------------------------------------------------------------- hookpoints
 
 pub fn cmd_hookpoints(ctx: &mut Ctx, a: &Args) -> Result<Value, String> {
